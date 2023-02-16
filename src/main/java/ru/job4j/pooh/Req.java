@@ -2,7 +2,8 @@ package ru.job4j.pooh;
 
 public class Req {
 
-    private static final String POST = "POST";
+    public static final String POST = "POST";
+    public static final String GET = "GET";
     private static final String QUEUE = "queue";
 
     private final String httpRequestType;

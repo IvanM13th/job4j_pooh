@@ -4,7 +4,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class TopicService implements Service {
-    private static final String GET = "GET";
     private final ConcurrentHashMap<String,
             ConcurrentHashMap<String, ConcurrentLinkedQueue<String>>> topics = new ConcurrentHashMap<>();
 
@@ -14,7 +13,7 @@ public class TopicService implements Service {
         String nameOrParam = req.getParam();
         String rsl = "";
         String status;
-        if (GET.equals(req.httpRequestType())) {
+        if (Req.GET.equals(req.httpRequestType())) {
             String[] response = whenGet(topic, nameOrParam);
             rsl = response[0];
             status = response[1];
@@ -29,24 +28,24 @@ public class TopicService implements Service {
         if (topics.getOrDefault(topic, null) == null || topics.get(topic).get(nameOrParam) == null) {
             topics.putIfAbsent(topic, new ConcurrentHashMap<>());
             topics.get(topic).putIfAbsent(nameOrParam, new ConcurrentLinkedQueue<>());
-            rsl[0] = "";
-            rsl[1] = "204";
+            rsl[0] = Resp.BLANK;
+            rsl[1] = Resp.FAIL;
         } else {
             rsl[0] = topics.get(topic).get(nameOrParam).poll();
-            rsl[1] = "200";
+            rsl[1] = Resp.SUCCESS;
         }
         return rsl;
     }
 
     private String whenPost(String topic, String nameOrParam) {
-        String rsl = "204";
+        String rsl = Resp.FAIL;
         if (topics.getOrDefault(topic, null) != null) {
             for (var themes : topics.keySet()) {
                 for (var c : topics.get(themes).values()) {
                     c.add(nameOrParam);
                 }
             }
-            rsl = "200";
+            rsl = Resp.SUCCESS;
         }
         return rsl;
     }
